@@ -62,24 +62,27 @@ double X(double t, double* y) {
 //    }
 //}
 
+/// <summary>
+/// Метод Рунге-Кутта принимает количество уравнений в системе, набор функций для каждого уравнения, двумерный массив для решений, где первый индекс номер состояния, второй номер переменной в системе, шаг метода, количество разбиений, набор значений, по которому производится интегрирование, набор начальных условий
+/// </summary>
 void RungeKutta(int count, double (**f)(double t, double* y), double** y, double h, int n, double* t, double* y0) {
     for (int i = 0; i < count; i++) {
-        y[0][i] = y0[i];
+        y[0][i] = y0[i]; //задание начальных условий
     }
     double* k1 = new double[count]();
     double* k2 = new double[count]();
     for (int i = 0; i < n-1; i++) {
-        for (int j = 0; j < count; j++) {
+        for (int j = 0; j < count; j++) { //вычисление k1 для всех функций
            k1[j] = f[j](t[i], y[i]);
         }
-        double* newY = new double[count];
+        double* newY = new double[count]; //определение новой точки для вычисления k2
         for (int j = 0; j < count; j++) {
             newY[j] = y[i][j] + h * k1[j];
         }
-        for (int j = 0; j < count; j++) {
+        for (int j = 0; j < count; j++) { //вычисление k2 для всех функций
             k2[j] = f[j](t[i]+h, newY);
         }
-        for (int j = 0; j < count; j++) {
+        for (int j = 0; j < count; j++) { //вычисление значений в следующей точке
             y[i + 1][j] = y[i][j] + h * (k1[j] + k2[j]) / 2;
         }
     }
