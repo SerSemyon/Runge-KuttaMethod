@@ -37,30 +37,6 @@ double X(double t, double* y) {
     return y[0] * cos(y[1]);
 }
 #pragma  endregion functionsZhukovskyProblem
-//void RungeKutta(double (*f1)(double t, double y1, double y2, double y3, double y4), double (*f2)(double t, double y1, double y2, double y3, double y4), double (*f3)(double t, double y1, double y2, double y3, double y4), double (*f4)(double t, double y1, double y2, double y3, double y4), double* y1, double* y2, double* y3, double* y4, double h, int n, double* t, double y1_0, double y2_0, double y3_0, double y4_0) {
-//    y1[0] = y1_0;
-//    y2[0] = y2_0;
-//    y3[0] = y3_0;
-//    y4[0] = y4_0;
-//    double k11, k12, k13, k14, k21, k22, k23, k24;
-//    for (int i = 0; i < n; i++) {
-//        k11 = f1(t[i], y1[i], y2[i], y3[i], y4[i]);
-//        k12 = f2(t[i], y1[i], y2[i], y3[i], y4[i]);
-//        k13 = f3(t[i], y1[i], y2[i], y3[i], y4[i]);
-//        k14 = f4(t[i], y1[i], y2[i], y3[i], y4[i]);
-//
-//        k21 = f1(t[i] + h, y1[i] + h * k11, y2[i] + h * k12, y3[i] + h * k13, y4[i] + h * k14);
-//        k22 = f2(t[i] + h, y1[i] + h * k11, y2[i] + h * k12, y3[i] + h * k13, y4[i] + h * k14);
-//        k23 = f3(t[i] + h, y1[i] + h * k11, y2[i] + h * k12, y3[i] + h * k13, y4[i] + h * k14);
-//        k24 = f4(t[i] + h, y1[i] + h * k11, y2[i] + h * k12, y3[i] + h * k13, y4[i] + h * k14);
-//
-//
-//        y1[i + 1] = y1[i] + h * (k11 + k21) / 2;
-//        y2[i + 1] = y2[i] + h * (k12 + k22) / 2;
-//        y3[i + 1] = y3[i] + h * (k13 + k23) / 2;
-//        y4[i + 1] = y4[i] + h * (k14 + k24) / 2;
-//    }
-//}
 
 /// <summary>
 /// Метод Рунге-Кутта принимает количество уравнений в системе, набор функций для каждого уравнения, двумерный массив для решений, где первый индекс номер состояния, второй номер переменной в системе, шаг метода, количество разбиений, набор значений, по которому производится интегрирование, набор начальных условий
@@ -82,10 +58,13 @@ void RungeKutta(int count, double (**f)(double t, double* y), double** y, double
         for (int j = 0; j < count; j++) { //вычисление k2 для всех функций
             k2[j] = f[j](t[i]+h, newY);
         }
+        delete[] newY;
         for (int j = 0; j < count; j++) { //вычисление значений в следующей точке
             y[i + 1][j] = y[i][j] + h * (k1[j] + k2[j]) / 2;
         }
     }
+    delete[] k1;
+    delete[] k2;
 }
 /// <summary>
 /// Вычисление погрешности
@@ -128,11 +107,20 @@ std::pair<double, double> testTask(int numberDivisions) {
     y0[1] = testY2(t[0]);
     RungeKutta(2, f, y, h, numberDivisions, t, y0); 
     std::pair<double, double> res(h, Inaccuracy(numberDivisions, t, y));
+    delete[] y0;
+    delete[] y1;
+    delete[] y2;
+    delete[] t;
+    delete[] f;
+    for (int i = 0; i < numberDivisions; i++) { //очистка памяти решения системы
+        delete[] y[i];
+    }
+    delete[] y;
     return res;
 }
 int main()
 {
-    std::cout << "\"X\", \"Y\"" << "\n";
+    std::cout << "\"X\", \"Z\"" << "\n";
     /*for (int i = 1000; i > 100; i--) {
         std::pair<double, double> inaccuracy = testTask(i);
         std::cout << inaccuracy.first<<","<< inaccuracy.second << "\n";
